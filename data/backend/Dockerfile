@@ -1,42 +1,34 @@
-FROM node:20-bullseye
+FROM node:20-slim
 
-# Environment variables passed from docker-compose
-ARG PUID
-ARG PGID
-ARG TZ
-ARG UMASK
+# Set build arguments
+ARG PUID=1000
+ARG PGID=1000
+ARG TZ=America/New_York
+ARG UMASK=002
 
-# Install required packages including OpenJDK (for FileBot)
+ENV TZ=$TZ \
+    UMASK=$UMASK
+
+# Install dependencies and FileBot
 RUN apt-get update && apt-get install -y \
     curl \
     gnupg \
     ca-certificates \
     openjdk-17-jre \
     sudo && \
-    # Only add group/user if they don't already exist
     getent group ${PGID} || groupadd -g ${PGID} appgroup && \
     id -u ${PUID} >/dev/null 2>&1 || useradd -u ${PUID} -g appgroup -m appuser && \
     echo 'appuser ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers && \
-    # Install FileBot
-    curl -fsSL https://get.filebot.net/filebot/KEYS.asc | gpg --dearmor -o /usr/share/keyrings/filebot-archive-keyring.gpg && \
-    echo "deb [signed-by=/usr/share/keyrings/filebot-archive-keyring.gpg] https://get.filebot.net/deb universal main" > /etc/apt/sources.list.d/filebot.list && \
+    curl -fsSL https://raw.githubusercontent.com/filebot/plugins/master/gpg/maintainer.gpg | gpg --dearmor -o /usr/share/keyrings/filebot-archive-keyring.gpg && \
+    echo "deb [signed-by=/usr/share/keyrings/filebot-archive-keyring.gpg] https://apt.filebot.net stable main" > /etc/apt/sources.list.d/filebot.list && \
     apt-get update && apt-get install -y filebot && \
     rm -rf /var/lib/apt/lists/*
 
-# Set working directory
 WORKDIR /app
 
-# Copy source code
-COPY . .
-
-# Install dependencies
+COPY package*.json ./
 RUN npm install
 
-# Set permissions
-RUN chown -R ${PUID}:${PGID} /app
+COPY . .
 
-# Switch to the app user
-USER appuser
-
-# Start server
 CMD ["node", "server.mjs"]
