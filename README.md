@@ -1,48 +1,114 @@
-# 🎬 RD FileBot Manager
+# RD FileBot Manager – Project Overview
 
-An automated system for renaming and organizing content from your Real-Debrid mount using FileBot, with a web UI, PostgreSQL tracking, and Docker-based deployment.
-
----
-
-## 📦 Features
-
-- Rename + copy content from a Real-Debrid read-only mount
-- Classify content as movie or series before processing
-- FileBot renaming engine integration
-- Tracks processed folders with PostgreSQL
-- Upload and manage your FileBot license
-- Web-based UI with login & dark mode
-- First-run setup prompts for database credentials and license
+## 🔧 Purpose
+A Dockerized full-stack application to rename and organize media files from a Real-Debrid mount, using FileBot. The app classifies folders as either movies or series, then processes them into the proper NAS directory with user input via a web interface.
 
 ---
 
-## 🚀 Deployment
-
-This app runs via Docker Compose. First, configure your media mount paths.
-
-### 🔧 Required Bind Mounts
-
-| Container Path | Description                     | Example (replace with your own)     |
-|----------------|----------------------------------|--------------------------------------|
-| `/rd`          | Real-Debrid mount (read-only)    | `/mnt/my_rd_mount`                  |
-| `/movies`      | Destination folder for movies    | `/media/my_storage/Movies`          |
-| `/series`      | Destination folder for series    | `/media/my_storage/TV_Shows`        |
-
-Edit `docker-compose.yml` to update these paths to match your host environment.
+## 🧱 Tech Stack
+- **Frontend:** React (dark mode, logo branding, simple UI)
+- **Backend:** Node.js (Express-style), handles folder listing and FileBot execution
+- **Database:** PostgreSQL (tracks processed folders + success/failure)
+- **Auth:** Basic Auth with default credentials (change required on first run)
+- **Deployment:** Portainer Stack using Docker Compose v3.8
 
 ---
 
-## 🛠 Environment Variables
+## 🗂 Folder Structure
 
-These are stored in a `.env` file in the root folder:
+**Host Paths:**
+- Project root: `/apps/rd-filebot`
+- Dev repo: `/apps/rd-filebot-dev`
+- Mounts required:
+  - `/mnt/zurg/__all__` → `/rd:ro`
+  - `/media/NAS/Movies` → `/movies`
+  - `/media/NAS/Series` → `/series`
 
-```env
+**In Container:**
+- `/rd` = read-only RD mount
+- `/movies` = movies output
+- `/series` = series output
+- `/app/data` = config, license, .env, DB volume
+
+---
+
+## ⚙️ Key Features
+- Browse root of `/rd` for unprocessed folders
+- Tag folder as "movie" or "series"
+- Trigger FileBot via backend
+- Tracks success/failure in PostgreSQL
+- Prompts for FileBot license upload (initial + replace)
+- Auth via Basic Auth — supports multiple users, stored in `.env`
+- First-run setup wizard for DB credentials
+- Reset App feature with confirmation prompt and optional backup/export
+
+---
+
+## 📦 Docker Stack (3 containers)
+- **`rd-filebot-db`** (PostgreSQL)
+- **`rd-filebot-backend`** (Node.js + FileBot)
+- **`rd-filebot-frontend`** (React app on port 3011)
+
+---
+
+## 🔐 Auth Defaults
+- Default username/password stored in `.env`
+- User is required to change password on first login via frontend
+- Additional users can be added via UI
+
+---
+
+## 📝 Environment Variables (.env)
+```
 POSTGRES_DB=rdfilebot
-POSTGRES_USER=rdadmin
-POSTGRES_PASSWORD=changeme
-PORT_BACKEND=3001
-PORT_FRONTEND=3000
+POSTGRES_USER=rduser
+POSTGRES_PASSWORD=rdpass
+PORT_BACKEND=3010
+PORT_FRONTEND=3011
 PUID=1000
 PGID=1000
 TZ=America/New_York
 UMASK=002
+```
+
+---
+
+## 📄 FileBot License Setup
+To use FileBot Core, you must purchase a license at [filebot.net](https://www.filebot.net/purchase.html).
+
+Once you receive the email with your license, follow these steps:
+
+1. Copy the entire license block (from `-----BEGIN PGP SIGNED MESSAGE-----` to `-----END PGP SIGNATURE-----`).
+2. Save it in a plain text file as:
+   ```
+   filebot.license
+   ```
+3. Place this file in:
+   ```
+   /apps/rd-filebot/data/filebot.license
+   ```
+4. Alternatively, upload it via the RD FileBot Manager web interface.
+
+> ✅ The app also detects expired/missing licenses and will prompt you to upload a new one.
+
+---
+
+## 📅 Planned for v2
+- Conflict detection (e.g., folder already exists)
+- UI-based conflict resolution (skip, overwrite, keep both, cancel)
+- Support for webhook notifications
+- Git integration for versioning config/DB backups
+
+---
+
+## 🐳 GitHub Repo
+- https://github.com/valboosky/rd-filebot
+- You can clone the repo using SSH into `/apps/rd-filebot`
+
+---
+
+## 🧠 Notes
+- Use `sudo` when cloning/moving into `/apps/`
+- FileBot license is required and handled via upload in UI
+- You use Warp on Mac (sometimes requires `kill` to stop Docker builds)
+- You plan to push final containers to Docker Hub or GHCR
