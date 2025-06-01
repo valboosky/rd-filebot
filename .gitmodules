@@ -1,0 +1,3 @@
+[submodule "rd-filebot.wiki"]
+	path = rd-filebot.wiki
+	url = https://github.com/valboosky/rd-filebot.wiki.git
