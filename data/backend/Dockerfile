@@ -27,7 +27,7 @@ WORKDIR /usr/src/app
 COPY . .
 
 # Install Node.js dependencies
-RUN npm ci
+RUN npm install
 
 # Build app
 RUN npm run build
