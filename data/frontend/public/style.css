@@ -1,0 +1,61 @@
+
+body {
+  background-color: #F2F2F2;
+  color: #333;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+h1, h2, h3 {
+  color: #E53935;
+}
+
+button {
+  background-color: #E53935;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.2s;
+}
+
+button:hover {
+  background-color: #D32F2F;
+}
+
+select {
+  padding: 0.4rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+/* Dark Mode Support */
+body.dark-mode {
+  background-color: #1e1e1e;
+  color: #f2f2f2;
+}
+
+body.dark-mode h1, body.dark-mode h2, body.dark-mode h3 {
+  color: #ff6e6e;
+}
+
+body.dark-mode button {
+  background-color: #ff6e6e;
+  color: #1e1e1e;
+}
+
+body.dark-mode button:hover {
+  background-color: #e53935;
+}
+
+body.dark-mode select {
+  background-color: #333;
+  color: #f2f2f2;
+  border-color: #555;
+}

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="RD FileBot Manager" />
+    <title>RD FileBot Manager</title>
+    <link rel="stylesheet" href="%PUBLIC_URL%/style.css" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 2rem;
+        background-color: #f9f9f9;
+      }
+      .branding {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 2rem;
+      }
+      .branding img {
+        height: 48px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="branding">
+    <div style="margin-left:auto">
+      <label style="font-size: 0.9rem;">🌙 Dark Mode
+        <input type="checkbox" id="darkToggle" onchange="document.body.classList.toggle('dark-mode')">
+      </label>
+    </div>
+      <img src="%PUBLIC_URL%/logo.png" alt="RD FileBot Manager logo" />
+      <h1>RD FileBot Manager</h1>
+    </div>
+    <div id="root"></div>
+
+<script>
+  // On load, apply dark mode if saved
+  if (localStorage.getItem('dark-mode') === 'true') {
+    document.body.classList.add('dark-mode');
+    document.getElementById('darkToggle').checked = true;
+  }
+
+  // Save toggle state to localStorage
+  document.getElementById('darkToggle').addEventListener('change', function() {
+    localStorage.setItem('dark-mode', this.checked);
+  });
+</script>
+  </body>
+</html>

@@ -1,0 +1,63 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: rdfilebot-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    networks:
+      - rdnet
+
+  backend:
+    build:
+      context: ./data/backend
+      dockerfile: Dockerfile
+    container_name: rdfilebot-backend
+    volumes:
+      - ./data/backend:/app
+      - ./data/license.psm:/root/.filebot/license.psm:ro
+      - /mnt/realdebrid:/rd:ro
+      - /mnt/nas/movies:/movies
+      - /mnt/nas/series:/series
+    environment:
+      - NODE_ENV=production
+      - PORT=${PORT_BACKEND}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_HOST=postgres
+      - PUID=1000
+      - PGID=1000
+      - UMASK=002
+      - TZ=America/New_York
+    ports:
+      - "${PORT_BACKEND}:3001"
+    depends_on:
+      - postgres
+    networks:
+      - rdnet
+
+  frontend:
+    build:
+      context: ./data/frontend
+      dockerfile: Dockerfile
+    container_name: rdfilebot-frontend
+    ports:
+      - "${PORT_FRONTEND}:80"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - UMASK=002
+      - TZ=America/New_York
+    networks:
+      - rdnet
+
+networks:
+  rdnet:
+    driver: bridge
