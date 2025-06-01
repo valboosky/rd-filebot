@@ -17,14 +17,13 @@ A Dockerized full-stack application to rename and organize media files from a Re
 ## 🗂 Folder Structure
 
 **Host Paths:**
-- Project root: `/apps/rd-filebot`
-- Dev repo: `/apps/rd-filebot-dev`
-- Mounts required:
-  - `/mnt/zurg/__all__` → `/rd:ro`
-  - `/media/NAS/Movies` → `/movies`
-  - `/media/NAS/Series` → `/series`
+- Project root: `/apps/rd-filebot` (recommended, but customizable)
+- Mounts required (you must replace these with your own media paths):
+  - Your Real-Debrid mount → `/rd:ro`
+  - Your Movies folder → `/movies`
+  - Your Series folder → `/series`
 
-**In Container:**
+**In Container (hardcoded mount points):**
 - `/rd` = read-only RD mount
 - `/movies` = movies output
 - `/series` = series output
@@ -83,9 +82,9 @@ Once you receive the email with your license, follow these steps:
    ```
    filebot.license
    ```
-3. Place this file in:
+3. Place this file in your **host-side data directory** mapped to the container's `/app/data` folder. For example:
    ```
-   /apps/rd-filebot/data/filebot.license
+   /your/custom/path/to/rd-filebot/data/filebot.license
    ```
 4. Alternatively, upload it via the RD FileBot Manager web interface.
 
@@ -103,12 +102,12 @@ Once you receive the email with your license, follow these steps:
 
 ## 🐳 GitHub Repo
 - https://github.com/valboosky/rd-filebot
-- You can clone the repo using SSH into `/apps/rd-filebot`
+- You can clone the repo using SSH into any folder (e.g., `/apps/rd-filebot` or another of your choice)
 
 ---
 
 ## 🧠 Notes
-- Use `sudo` when cloning/moving into `/apps/`
-- FileBot license is required and handled via upload in UI
+- Use `sudo` if writing into protected directories like `/apps/`
+- FileBot license is required and handled via upload or direct file placement
 - You use Warp on Mac (sometimes requires `kill` to stop Docker builds)
 - You plan to push final containers to Docker Hub or GHCR
