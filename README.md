@@ -102,7 +102,7 @@ Once you receive the email with your license, follow these steps:
 
 ## 🐳 GitHub Repo
 - https://github.com/valboosky/rd-filebot
-- You can clone the repo using SSH into any folder (e.g., `/apps/rd-filebot` or another of your choice)
+- You can clone the repo using SSH into any folder (e.g., `/apps/rd-filebot` — a recommended standard for self-hosted apps — or another custom path of your choice) (e.g., `/apps/rd-filebot` or another of your choice)
 
 ---
 
@@ -111,3 +111,4 @@ Once you receive the email with your license, follow these steps:
 - FileBot license is required and handled via upload or direct file placement
 - You use Warp on Mac (sometimes requires `kill` to stop Docker builds)
 - You plan to push final containers to Docker Hub or GHCR
+
