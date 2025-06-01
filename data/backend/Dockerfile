@@ -1,13 +1,8 @@
-FROM node:20-slim
+FROM node:20-slim AS base
 
-# Set build arguments
+# Environment variables for user and group
 ARG PUID=1000
 ARG PGID=1000
-ARG TZ=America/New_York
-ARG UMASK=002
-
-ENV TZ=$TZ \
-    UMASK=$UMASK
 
 # Install dependencies and FileBot
 RUN apt-get update && apt-get install -y \
@@ -19,16 +14,42 @@ RUN apt-get update && apt-get install -y \
     getent group ${PGID} || groupadd -g ${PGID} appgroup && \
     id -u ${PUID} >/dev/null 2>&1 || useradd -u ${PUID} -g appgroup -m appuser && \
     echo 'appuser ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers && \
-    curl -fsSL https://raw.githubusercontent.com/filebot/plugins/master/gpg/maintainer.gpg | gpg --dearmor -o /usr/share/keyrings/filebot-archive-keyring.gpg && \
-    echo "deb [signed-by=/usr/share/keyrings/filebot-archive-keyring.gpg] https://apt.filebot.net stable main" > /etc/apt/sources.list.d/filebot.list && \
-    apt-get update && apt-get install -y filebot && \
+    curl -fsSL "https://raw.githubusercontent.com/filebot/plugins/master/gpg/maintainer.pub" | gpg --dearmor -o /usr/share/keyrings/filebot.gpg && \
+    echo "deb [arch=all signed-by=/usr/share/keyrings/filebot.gpg] https://get.filebot.net/deb/ universal main" > /etc/apt/sources.list.d/filebot.list && \
+    apt-get update && \
+    apt-get install -y --install-recommends filebot && \
     rm -rf /var/lib/apt/lists/*
 
-WORKDIR /app
+# Set working directory
+WORKDIR /usr/src/app
 
-COPY package*.json ./
-RUN npm install
-
+# Copy project files
 COPY . .
 
-CMD ["node", "server.mjs"]
+# Install Node.js dependencies
+RUN npm ci
+
+# Build app
+RUN npm run build
+
+# Final stage
+FROM node:20-slim
+
+ARG PUID=1000
+ARG PGID=1000
+
+# Copy built files from base stage
+COPY --from=base /usr/src/app /usr/src/app
+
+# Set working directory
+WORKDIR /usr/src/app
+
+# Create app user
+RUN getent group ${PGID} || groupadd -g ${PGID} appgroup && \
+    id -u ${PUID} >/dev/null 2>&1 || useradd -u ${PUID} -g appgroup -m appuser
+
+USER appuser
+
+# Expose port and start the app
+EXPOSE 3000
+CMD ["node", "dist/server.mjs"]
