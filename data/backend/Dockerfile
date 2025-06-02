@@ -14,7 +14,7 @@ RUN apt-get update && apt-get install -y \
  && rm -rf /var/lib/apt/lists/*
 
 # Create non-root user to match host UID/GID
-RUN groupadd -g 1000 appgroup && useradd -u 1000 -g appgroup -m appuser
+#RUN groupadd -g 1000 appgroup && useradd -u 1000 -g appgroup -m appuser
 
 # Copy package files and install node modules
 COPY package*.json ./
@@ -24,7 +24,7 @@ RUN npm install
 COPY . .
 
 # Use non-root user
-USER appuser
+#USER appuser
 
 # Expose backend port
 EXPOSE 3001
