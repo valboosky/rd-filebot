@@ -11,7 +11,27 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 3001;
 
-app.use(cors());
+// 🌐 Allowed origins for CORS (adjust as needed)
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://127.0.0.1:3000',
+  'http://rd-filebot-frontend:3000',
+  `http://${process.env.HOSTNAME}:3000`, // dynamic support in Docker
+  'http://your-domain.com' // Replace with your real domain or IP if needed
+];
+
+// ✅ Use custom CORS middleware
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.warn(`Blocked CORS origin: ${origin}`);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
+}));
 
 // Basic Auth Middleware
 const basicAuth = (req, res, next) => {
