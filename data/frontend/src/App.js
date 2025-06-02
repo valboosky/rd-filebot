@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
-const BACKEND_URL = '/api';
+const BACKEND_URL = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 function App() {
   const [folders, setFolders] = useState([]);
@@ -12,7 +12,10 @@ function App() {
   useEffect(() => {
     axios.get(`${BACKEND_URL}/folders`)
       .then(res => setFolders(res.data))
-      .catch(err => console.error(err));
+      .catch(err => {
+        console.error('Error fetching folders:', err);
+        setMessage('❌ Failed to fetch folders');
+      });
   }, []);
 
   const handleSelect = (name, value) => {
