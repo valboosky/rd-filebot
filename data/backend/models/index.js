@@ -1,3 +1,6 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import { Sequelize, DataTypes } from 'sequelize';
 
 export const sequelize = new Sequelize(
