@@ -26,27 +26,30 @@
   </head>
   <body>
     <div class="branding">
-    <div style="margin-left:auto">
-      <label style="font-size: 0.9rem;">🌙 Dark Mode
-        <input type="checkbox" id="darkToggle" onchange="document.body.classList.toggle('dark-mode')">
-      </label>
-    </div>
+      <div style="margin-left:auto">
+        <label style="font-size: 0.9rem;">🌙 Dark Mode
+          <input type="checkbox" id="darkToggle" onchange="document.body.classList.toggle('dark-mode')">
+        </label>
+      </div>
       <img src="%PUBLIC_URL%/logo.png" alt="RD FileBot Manager logo" />
       <h1>RD FileBot Manager</h1>
     </div>
     <div id="root"></div>
 
-<script>
-  // On load, apply dark mode if saved
-  if (localStorage.getItem('dark-mode') === 'true') {
-    document.body.classList.add('dark-mode');
-    document.getElementById('darkToggle').checked = true;
-  }
+    <script>
+      // On load, apply dark mode if saved
+      if (localStorage.getItem('dark-mode') === 'true') {
+        document.body.classList.add('dark-mode');
+        document.getElementById('darkToggle').checked = true;
+      }
 
-  // Save toggle state to localStorage
-  document.getElementById('darkToggle').addEventListener('change', function() {
-    localStorage.setItem('dark-mode', this.checked);
-  });
-</script>
+      // Save toggle state to localStorage
+      document.getElementById('darkToggle').addEventListener('change', function () {
+        localStorage.setItem('dark-mode', this.checked);
+      });
+    </script>
+
+    <!-- 🔧 Add this line to mount your Vite app -->
+    <script type="module" src="/src/main.js"></script>
   </body>
 </html>
