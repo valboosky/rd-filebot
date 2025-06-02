@@ -1,36 +1,30 @@
-# Stage 1: Base
+# Stage 1: Build dependencies and source
 FROM node:20-slim AS base
 
 WORKDIR /usr/src/app
 
-# Install base dependencies
+# Install dependencies needed at build time
 RUN apt-get update && apt-get install -y \
-    curl \
-    gnupg \
-    ca-certificates \
-    openjdk-17-jre \
-    sudo && \
-    getent group 1000 || groupadd -g 1000 appgroup && \
-    id -u 1000 >/dev/null 2>&1 || useradd -u 1000 -g appgroup -m appuser
+  curl \
+  gnupg \
+  ca-certificates \
+  openjdk-17-jre
 
-# Copy package files & install
+# Copy package files and install
 COPY package*.json ./
 RUN npm install
 
-# Copy full source code
+# Copy all source code
 COPY . .
 
-# Stage 2: Runtime
+# Stage 2: Runtime image
 FROM node:20-slim
 
 WORKDIR /usr/src/app
+
+# Copy app from build stage
 COPY --from=base /usr/src/app /usr/src/app
 
-# Create non-root user
-RUN getent group 1000 || groupadd -g 1000 appgroup && \
-    id -u 1000 >/dev/null 2>&1 || useradd -u 1000 -g appgroup -m appuser
-
-USER appuser
-
+# Do NOT use appuser for now — run as root (default)
 EXPOSE 3001
 CMD ["npm", "start"]
