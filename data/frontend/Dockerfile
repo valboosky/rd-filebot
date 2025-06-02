@@ -19,7 +19,7 @@ FROM nginx:stable-alpine
 RUN rm -rf /usr/share/nginx/html/*
 
 # Copy build output from previous stage
-COPY --from=builder /app/build /usr/share/nginx/html
+COPY --from=builder /app/dist /usr/share/nginx/html
 
 # Optional: Add a custom nginx config if needed
 # COPY nginx.conf /etc/nginx/nginx.conf
