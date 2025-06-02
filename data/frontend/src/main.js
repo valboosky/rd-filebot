@@ -1,7 +1,3 @@
-// /src/main.js
+import '../public/style.css';
 
-import './style.css';
-
-document.getElementById('root').innerHTML = `
-  <h2>RD FileBot Manager is running</h2>
-`;
+document.getElementById('root').innerHTML = `<p>Hello from main.js</p>`;

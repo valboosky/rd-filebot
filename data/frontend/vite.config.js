@@ -1,18 +1,11 @@
 import { defineConfig } from 'vite'
-import path from 'path'
 
 export default defineConfig({
-  root: '.', // Project root
-  publicDir: 'public', // Serves assets from public/
+  root: '.', // use current folder
   build: {
     outDir: 'dist',
-    emptyOutDir: true,
     rollupOptions: {
-      input: path.resolve(__dirname, 'index.html') // Tell Vite where index.html is
-    }
+      input: 'index.html',
+    },
   },
-  server: {
-    port: 3000,
-    open: false
-  }
 })
