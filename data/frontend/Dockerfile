@@ -1,55 +1,31 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" href="/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="RD FileBot Manager" />
-    <title>RD FileBot Manager</title>
-    <link rel="stylesheet" href="/style.css" />
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        padding: 2rem;
-        background-color: #f9f9f9;
-      }
-      .branding {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        margin-bottom: 2rem;
-      }
-      .branding img {
-        height: 48px;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="branding">
-      <img src="/logo.png" alt="RD FileBot Manager logo" />
-      <h1>RD FileBot Manager</h1>
-      <div style="margin-left:auto">
-        <label style="font-size: 0.9rem;">🌙 Dark Mode
-          <input type="checkbox" id="darkToggle" onchange="document.body.classList.toggle('dark-mode')">
-        </label>
-      </div>
-    </div>
-    <div id="root"></div>
+# Stage 1: Build the frontend using Node.js
+FROM node:20 AS builder
 
-    <!-- ✅ Fixed the script path -->
-    <script type="module" src="/src/main.js"></script>
+# Set working directory
+WORKDIR /app
 
-    <script>
-      // On load, apply dark mode if saved
-      if (localStorage.getItem('dark-mode') === 'true') {
-        document.body.classList.add('dark-mode');
-        document.getElementById('darkToggle').checked = true;
-      }
+# Install dependencies
+COPY package*.json ./
+RUN npm install
 
-      // Save toggle state to localStorage
-      document.getElementById('darkToggle').addEventListener('change', function() {
-        localStorage.setItem('dark-mode', this.checked);
-      });
-    </script>
-  </body>
-</html>
+# Copy source files and build
+COPY . ./
+RUN npm run build
+
+# Stage 2: Serve with NGINX
+FROM nginx:stable-alpine
+
+# Remove default nginx index page
+RUN rm -rf /usr/share/nginx/html/*
+
+# Copy build output from previous stage
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+# Optional: Add a custom nginx config if needed
+# COPY nginx.conf /etc/nginx/nginx.conf
+
+# Expose default HTTP port
+EXPOSE 3000
+
+# Start NGINX in the foreground
+CMD ["nginx", "-g", "daemon off;"]
