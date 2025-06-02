@@ -11,29 +11,14 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 3001;
 
-// 🌐 Allowed origins for CORS (adjust as needed)
-const allowedOrigins = [
-  'http://localhost:3000',
-  'http://127.0.0.1:3000',
-  'http://rd-filebot-frontend:3000',
-  `http://${process.env.HOSTNAME}:3000`, // dynamic support in Docker
-  'http://your-domain.com' // Replace with your real domain or IP if needed
-];
-
-// ✅ Use custom CORS middleware
+// ✅ Docker-safe CORS: Allow all origins (Docker internal use only)
 app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      console.warn(`Blocked CORS origin: ${origin}`);
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true
+  origin: '*',        // Accept any origin inside the Docker network
+  methods: ['GET', 'POST'],
+  credentials: false  // Set to true only if you use cookies or auth headers
 }));
 
-// Basic Auth Middleware
+// 🔐 Basic Auth Middleware
 const basicAuth = (req, res, next) => {
   const auth = req.headers.authorization;
   const [expectedUser, expectedPass] = ["admin", "changeme"];
@@ -54,6 +39,7 @@ const basicAuth = (req, res, next) => {
 app.use(basicAuth);
 app.use(express.json());
 
+// 📁 API: List folders
 app.get('/api/folders', async (req, res) => {
   try {
     const entries = fs.readdirSync('/rd', { withFileTypes: true })
@@ -75,6 +61,7 @@ app.get('/api/folders', async (req, res) => {
   }
 });
 
+// 🚀 API: Trigger processing
 app.post('/api/process', async (req, res) => {
   const { folderName, type } = req.body;
 
@@ -107,6 +94,7 @@ app.post('/api/process', async (req, res) => {
   }
 });
 
+// 📦 Initialize DB and start server
 (async () => {
   try {
     await sequelize.sync();
